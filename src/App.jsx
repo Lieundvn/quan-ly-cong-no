@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import './App.css';
-import CustomerList from './components/CustomerList';
+import CustomerList from './components/customerlist';
 import CustomerDetails from './components/CustomerDetails'; // Lấy linh kiện mới vào
 
 function App() {
