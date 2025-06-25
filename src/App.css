@@ -1,0 +1,75 @@
+/* Áp dụng cho toàn bộ ứng dụng */
+.App {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 20px;
+  font-family: sans-serif;
+  color: #333;
+}
+
+h1, h3 {
+  text-align: center;
+  color: #2c3e50;
+}
+
+/* Biểu mẫu (form) thêm khách hàng */
+.customer-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* Khoảng cách giữa các ô */
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  background-color: #f9f9f9;
+}
+
+.customer-form input,
+.customer-form textarea {
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.customer-form button {
+  padding: 12px;
+  font-size: 16px;
+  background-color: #28a745; /* Màu xanh lá */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.customer-form button:hover {
+  background-color: #218838; /* Màu xanh lá đậm hơn */
+}
+
+/* Bảng hiển thị dữ liệu */
+.table-container {
+  overflow-x: auto; /* Giúp bảng không bị vỡ trên màn hình nhỏ */
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse; /* Gộp các đường viền lại */
+  margin-top: 20px;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: left;
+}
+
+th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+/* Tạo màu xen kẽ cho các hàng để dễ nhìn */
+tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
