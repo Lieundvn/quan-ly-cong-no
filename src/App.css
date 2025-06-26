@@ -1,41 +1,83 @@
-/* Áp dụng cho toàn bộ ứng dụng */
-.App {
-  max-width: 800px;
+/* --- Cấu trúc chung & Khung Đăng nhập --- */
+.container {
+  max-width: 900px;
   margin: 40px auto;
   padding: 20px;
   font-family: sans-serif;
   color: #333;
 }
 
-h1, h3 {
+.auth-container {
+  max-width: 420px;
+  margin: 50px auto;
+  padding: 30px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  background-color: #fff;
+}
+
+.auth-container h1 {
+  margin-top: 0;
+}
+
+/* --- Giao diện chung trong Dashboard --- */
+
+h1, h2, h3 {
   text-align: center;
   color: #2c3e50;
 }
 
-/* Biểu mẫu (form) thêm khách hàng */
+hr {
+  border: none;
+  border-top: 1px solid #eee;
+  margin: 30px 0;
+}
+
+/* --- Nút Đăng xuất --- */
+.logout-button {
+  float: right;
+  background-color: #f39c12;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+.logout-button:hover {
+  background-color: #e67e22;
+}
+
+
+/* --- Biểu mẫu (form) --- */
 .customer-form {
   display: flex;
   flex-direction: column;
-  gap: 15px; /* Khoảng cách giữa các ô */
+  gap: 15px;
   padding: 20px;
   border: 1px solid #ccc;
   border-radius: 8px;
-  margin-bottom: 30px;
+  margin-top: 20px;
+  margin-bottom: 20px;
   background-color: #f9f9f9;
 }
 
 .customer-form input,
-.customer-form textarea {
+.customer-form textarea,
+.customer-form select {
   padding: 10px;
   font-size: 16px;
   border: 1px solid #ccc;
   border-radius: 4px;
+  box-sizing: border-box; /* Quan trọng để padding không làm vỡ layout */
+  width: 100%;
 }
 
 .customer-form button {
   padding: 12px;
   font-size: 16px;
-  background-color: #28a745; /* Màu xanh lá */
+  background-color: #28a745;
   color: white;
   border: none;
   border-radius: 4px;
@@ -44,17 +86,17 @@ h1, h3 {
 }
 
 .customer-form button:hover {
-  background-color: #218838; /* Màu xanh lá đậm hơn */
+  background-color: #218838;
 }
 
-/* Bảng hiển thị dữ liệu */
+/* --- Bảng hiển thị dữ liệu --- */
 .table-container {
-  overflow-x: auto; /* Giúp bảng không bị vỡ trên màn hình nhỏ */
+  overflow-x: auto;
 }
 
 table {
   width: 100%;
-  border-collapse: collapse; /* Gộp các đường viền lại */
+  border-collapse: collapse;
   margin-top: 20px;
 }
 
@@ -62,6 +104,7 @@ th, td {
   border: 1px solid #ddd;
   padding: 12px;
   text-align: left;
+  vertical-align: middle;
 }
 
 th {
@@ -69,7 +112,91 @@ th {
   font-weight: bold;
 }
 
-/* Tạo màu xen kẽ cho các hàng để dễ nhìn */
 tbody tr:nth-child(even) {
   background-color: #f9f9f9;
+}
+
+/* Làm nổi bật hàng đang được chọn */
+.selected-row {
+  background-color: #fff3cd !important; 
+}
+
+/* --- Khu vực giao dịch --- */
+.transaction-section {
+  margin-top: 20px;
+  padding: 20px;
+  background-color: #e9f7ef;
+  border: 1px solid #a7d7c5;
+  border-radius: 8px;
+}
+
+.summary {
+  font-size: 1.2em;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #d4edda;
+  border-radius: 4px;
+}/* --- Khu vực Summary (Màu đỏ) --- */
+.summary-section {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.summary-box {
+  flex: 1; /* Chia đều không gian */
+  background-color: #f2f2f2;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.summary-box h4 {
+  margin-top: 0;
+  color: #555;
+}
+
+.summary-box p {
+  font-size: 1.5em;
+  font-weight: bold;
+  color: #28a745;
+  margin-bottom: 0;
+}/* --- Huy hiệu cảnh báo --- */
+.alert-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+  color: white;
+  min-width: 24px;
+  text-align: center;
+}
+
+.alert-badge.red {
+  background-color: #e74c3c; /* Màu đỏ */
+}
+
+.alert-badge.green {
+  background-color: #28a745; /* Màu xanh lá */
+}
+
+/* --- Chi tiết cảnh báo --- */
+.alert-details {
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+  color: #856404;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 15px 0;
+  text-align: center;
+}/* --- Ô tóm tắt trong trang chi tiết --- */
+.details-summary {
+  background-color: #eaf2f8; /* Màu xanh dương nhạt */
+  margin-top: 15px;
+}
+.details-summary p {
+  color: #3498db; /* Màu xanh dương */
 }
