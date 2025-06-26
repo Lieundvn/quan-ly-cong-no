@@ -1,12 +1,33 @@
-/* --- Cấu trúc chung & Khung Đăng nhập --- */
+/* === GIAO DIỆN LIGHT MODE (Nền trắng, chữ đen) === */
+
+/* Nền và phông chữ chung */
+body {
+  background-color: #f4f6f8; /* Màu nền trắng xám rất nhẹ */
+  color: #333333; /* Màu chữ chính (xám đậm) */
+  font-family: sans-serif;
+}
+
+/* Khung chứa chính của ứng dụng */
 .container {
   max-width: 900px;
   margin: 40px auto;
   padding: 20px;
-  font-family: sans-serif;
-  color: #333;
 }
 
+/* Tiêu đề */
+h1, h2, h3 {
+  text-align: center;
+  color: #2c3e50; /* Màu xanh đen */
+  font-weight: 600;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #e0e0e0;
+  margin: 30px 0;
+}
+
+/* --- Khu vực Đăng nhập --- */
 .auth-container {
   max-width: 420px;
   margin: 50px auto;
@@ -14,30 +35,13 @@
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  background-color: #fff;
-}
-
-.auth-container h1 {
-  margin-top: 0;
-}
-
-/* --- Giao diện chung trong Dashboard --- */
-
-h1, h2, h3 {
-  text-align: center;
-  color: #2c3e50;
-}
-
-hr {
-  border: none;
-  border-top: 1px solid #eee;
-  margin: 30px 0;
+  background-color: #ffffff; /* Nền trắng */
 }
 
 /* --- Nút Đăng xuất --- */
 .logout-button {
   float: right;
-  background-color: #f39c12;
+  background-color: #6c757d; /* Màu xám */
   color: white;
   border: none;
   padding: 8px 12px;
@@ -46,9 +50,8 @@ hr {
   font-weight: bold;
 }
 .logout-button:hover {
-  background-color: #e67e22;
+  background-color: #5a6268;
 }
-
 
 /* --- Biểu mẫu (form) --- */
 .customer-form {
@@ -60,31 +63,32 @@ hr {
   border-radius: 8px;
   margin-top: 20px;
   margin-bottom: 20px;
-  background-color: #f9f9f9;
+  background-color: #ffffff; /* Nền trắng */
 }
 
 .customer-form input,
 .customer-form textarea,
 .customer-form select {
-  padding: 10px;
+  padding: 12px;
   font-size: 16px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  box-sizing: border-box; /* Quan trọng để padding không làm vỡ layout */
+  background-color: #ffffff;
+  color: #333333; /* Chữ màu đen */
+  box-sizing: border-box;
   width: 100%;
 }
 
 .customer-form button {
   padding: 12px;
   font-size: 16px;
-  background-color: #28a745;
+  background-color: #28a745; /* Màu xanh lá */
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  font-weight: bold;
 }
-
 .customer-form button:hover {
   background-color: #218838;
 }
@@ -98,6 +102,7 @@ table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
+  background-color: #ffffff;
 }
 
 th, td {
@@ -105,40 +110,29 @@ th, td {
   padding: 12px;
   text-align: left;
   vertical-align: middle;
+  color: #333333; /* Chữ trong bảng màu xám đậm */
 }
 
 th {
-  background-color: #f2f2f2;
+  background-color: #f2f6fa; /* Nền của tiêu đề bảng */
   font-weight: bold;
+  color: #2c3e50; /* Màu chữ tiêu đề */
 }
 
-tbody tr:nth-child(even) {
-  background-color: #f9f9f9;
-}
-
-/* Làm nổi bật hàng đang được chọn */
-.selected-row {
-  background-color: #fff3cd !important; 
-}
-
-/* --- Khu vực giao dịch --- */
-.transaction-section {
-  margin-top: 20px;
-  padding: 20px;
-  background-color: #e9f7ef;
-  border: 1px solid #a7d7c5;
-  border-radius: 8px;
-}
-
-.summary {
-  font-size: 1.2em;
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 20px;
-  padding: 15px;
-  background-color: #d4edda;
+/* Nút bấm trong bảng */
+td button {
+  background-color: #007bff; /* Màu xanh dương */
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
   border-radius: 4px;
-}/* --- Khu vực Summary (Màu đỏ) --- */
+  cursor: pointer;
+}
+td button:hover {
+  background-color: #0056b3;
+}
+
+/* --- Khu vực tóm tắt (Tổng tiền vay...) --- */
 .summary-section {
   display: flex;
   gap: 20px;
@@ -146,57 +140,29 @@ tbody tr:nth-child(even) {
 }
 
 .summary-box {
-  flex: 1; /* Chia đều không gian */
-  background-color: #f2f2f2;
+  flex: 1;
+  background-color: #ffffff;
   padding: 20px;
   border-radius: 8px;
   text-align: center;
+  border: 1px solid #e0e0e0;
 }
 
 .summary-box h4 {
   margin-top: 0;
-  color: #555;
+  color: #6c757d; /* Màu chữ tiêu đề xám */
 }
 
 .summary-box p {
   font-size: 1.5em;
   font-weight: bold;
-  color: #28a745;
+  color: #343a40; /* MÀU SỐ MÀU ĐEN */
   margin-bottom: 0;
-}/* --- Huy hiệu cảnh báo --- */
+}
+
+/* --- Các huy hiệu cảnh báo --- */
 .alert-badge {
   display: inline-block;
   padding: 4px 8px;
   border-radius: 12px;
   font-size: 12px;
-  font-weight: bold;
-  color: white;
-  min-width: 24px;
-  text-align: center;
-}
-
-.alert-badge.red {
-  background-color: #e74c3c; /* Màu đỏ */
-}
-
-.alert-badge.green {
-  background-color: #28a745; /* Màu xanh lá */
-}
-
-/* --- Chi tiết cảnh báo --- */
-.alert-details {
-  background-color: #fff3cd;
-  border: 1px solid #ffeeba;
-  color: #856404;
-  padding: 15px;
-  border-radius: 8px;
-  margin: 15px 0;
-  text-align: center;
-}/* --- Ô tóm tắt trong trang chi tiết --- */
-.details-summary {
-  background-color: #eaf2f8; /* Màu xanh dương nhạt */
-  margin-top: 15px;
-}
-.details-summary p {
-  color: #3498db; /* Màu xanh dương */
-}
