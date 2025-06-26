@@ -9,26 +9,26 @@ function App() {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const [customers, setCustomers] = useState([]);
+  // State cho màn hình chính
+  const [customersWithAlerts, setCustomersWithAlerts] = useState([]);
+  const [summaryData, setSummaryData] = useState({ total_loaned: 0, total_accrued_interest: 0 });
   const [newCustomer, setNewCustomer] = useState({ name: '', phone: '', notes: '' });
-  const [selectedCustomer, setSelectedCustomer] = useState(null);
   
+  // State cho màn hình chi tiết
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [loans, setLoans] = useState([]);
   const [newLoan, setNewLoan] = useState({ amount: '', rate: '' });
   const [selectedLoan, setSelectedLoan] = useState(null);
-  
   const [transactions, setTransactions] = useState([]);
   const [newTransaction, setNewTransaction] = useState({ type: 'trả lãi', amount: '' });
 
   // === LOGIC XỬ LÝ ĐĂNG NHẬP ===
   useEffect(() => {
-    // Lấy phiên làm việc ngay khi tải trang
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
-      setLoading(false); // Đánh dấu đã tải xong thông tin session
+      setLoading(false);
     });
 
-    // Lắng nghe các thay đổi về sau (đăng nhập, đăng xuất)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
     });
@@ -36,22 +36,23 @@ function App() {
     return () => subscription.unsubscribe();
   }, []);
 
-
   // === CÁC HÀM LẤY DỮ LIỆU ===
-  useEffect(() => {
-    if(session) { // Chỉ lấy dữ liệu nếu đã đăng nhập
-      if (!selectedCustomer) {
-        fetchCustomers();
-      } else {
-        fetchCustomerDetails(selectedCustomer.id);
-      }
-    }
-  }, [selectedCustomer, session]); // Chạy lại khi session hoặc selectedCustomer thay đổi
+  // Hàm lấy dữ liệu tổng quan cho màn hình chính
+  async function fetchDashboardData() {
+    const { data: customersData } = await supabase.rpc('get_customers_with_alert_status');
+    setCustomersWithAlerts(customersData || []);
 
-  async function fetchCustomers() {
-    const { data } = await supabase.from('customers').select('*').order('created_at', { ascending: false });
-    setCustomers(data || []);
+    const { data: summary } = await supabase.rpc('get_dashboard_summary');
+    if (summary) {
+      setSummaryData(summary);
+    }
   }
+
+  useEffect(() => {
+    if (session && !selectedCustomer) {
+      fetchDashboardData();
+    }
+  }, [selectedCustomer, session]);
 
   async function fetchCustomerDetails(customerId) {
     const { data } = await supabase.from('loans').select('*').eq('customer_id', customerId);
@@ -59,27 +60,35 @@ function App() {
   }
 
   // === CÁC HÀM XỬ LÝ LOGIC KHÁC ===
+  async function handleSelectCustomer(customer) {
+    setSelectedCustomer(customer);
+    fetchCustomerDetails(customer.id);
+  }
+
   async function handleSelectLoan(loan) {
     setSelectedLoan(loan);
     const { data } = await supabase.from('transactions').select('*').eq('loan_id', loan.id).order('transaction_date');
     setTransactions(data || []);
   }
 
-  async function handleAddCustomer(e) { e.preventDefault(); if (!newCustomer.name) return; await supabase.from('customers').insert([{ ...newCustomer, user_id: session.user.id }]); setNewCustomer({ name: '', phone: '', notes: '' }); fetchCustomers(); }
+  async function handleAddCustomer(e) { e.preventDefault(); if (!newCustomer.name) return; await supabase.from('customers').insert([{ ...newCustomer, user_id: session.user.id }]); setNewCustomer({ name: '', phone: '', notes: '' }); fetchDashboardData(); }
   async function handleAddLoan(e) { e.preventDefault(); const amount = parseInt(newLoan.amount); const rate = parseFloat(newLoan.rate); if (!amount || !rate) return; const { data: createdLoan } = await supabase.from('loans').insert({ customer_id: selectedCustomer.id, loan_amount: amount, interest_rate: rate }).select().single(); if (createdLoan) { await supabase.from('transactions').insert({ loan_id: createdLoan.id, transaction_type: 'giải ngân', amount: amount, transaction_date: new Date() }); } setNewLoan({ amount: '', rate: '' }); fetchCustomerDetails(selectedCustomer.id); }
   async function handleAddTransaction(e) { e.preventDefault(); const amount = parseInt(newTransaction.amount); if (!amount) return; await supabase.from('transactions').insert({ loan_id: selectedLoan.id, transaction_type: newTransaction.type, amount: amount, transaction_date: new Date() }); handleSelectLoan(selectedLoan); }
   function calculateCurrentPrincipal() { if (!transactions) return 0; return transactions.reduce((acc, tx) => { if (tx.transaction_type === 'giải ngân') return acc + tx.amount; if (tx.transaction_type === 'trả gốc') return acc - tx.amount; return acc; }, 0); }
   async function handleLogout() { await supabase.auth.signOut(); }
 
+  // Component nhỏ để hiển thị huy hiệu cảnh báo
+  const AlertBadge = ({ days_overdue }) => {
+    if (!days_overdue || days_overdue <= 0) {
+      return <span className="alert-badge green">Đúng hạn</span>;
+    }
+    const level = Math.floor((days_overdue - 1) / 30) + 1;
+    return <span className="alert-badge red" title={`Quá hạn ${days_overdue} ngày`}>{level}</span>;
+  };
 
   // === PHẦN HIỂN THỊ GIAO DIỆN (VIEW) ===
+  if (loading) return <div className="container"><p>Đang tải ứng dụng...</p></div>;
 
-  // Nếu đang chờ lấy thông tin session, hiển thị màn hình chờ
-  if (loading) {
-    return <div className="container"><p>Đang tải ứng dụng...</p></div>;
-  }
-
-  // Nếu không có session, hiển thị form đăng nhập
   if (!session) {
     return (
       <div className="auth-container">
@@ -90,14 +99,22 @@ function App() {
     );
   }
 
-  // Nếu đã có session, hiển thị giao diện quản lý
-  // Giao diện chính - Danh sách khách hàng
   if (!selectedCustomer) {
+    // Giao diện chính - Danh sách khách hàng
     return (
       <div className="container">
         <button className="logout-button" onClick={handleLogout}>Đăng xuất</button>
         <h1>Bảng Công Nợ Khách Hàng</h1>
-        {/* Phần tóm tắt có thể thêm lại ở đây nếu muốn */}
+        <div className="summary-section">
+          <div className="summary-box">
+            <h4>Tổng Tiền Đã Vay</h4>
+            <p>{summaryData.total_loaned.toLocaleString()} VND</p>
+          </div>
+          <div className="summary-box">
+            <h4>Tổng Lãi Tạm Tính Đến Nay</h4>
+            <p>{Math.round(summaryData.total_accrued_interest).toLocaleString()} VND</p>
+          </div>
+        </div>
         <form onSubmit={handleAddCustomer} className="customer-form">
           <h3>Thêm khách hàng mới</h3>
           <input placeholder="Tên khách hàng" value={newCustomer.name} onChange={e => setNewCustomer({ ...newCustomer, name: e.target.value })} required />
@@ -107,15 +124,30 @@ function App() {
         </form>
         <div className="table-container">
           <table>
-            <thead><tr><th>Tên khách hàng</th><th>Hành động</th></tr></thead>
-            <tbody>{customers.map(c => <tr key={c.id}><td>{c.name}</td><td><button onClick={() => setSelectedCustomer(c)}>Xem Chi Tiết</button></td></tr>)}</tbody>
+            <thead>
+              <tr>
+                <th>Tên khách hàng</th>
+                <th>Tình trạng</th>
+                <th>Số điện thoại</th>
+                <th>Hành động</th>
+              </tr>
+            </thead>
+            <tbody>
+              {customersWithAlerts.map(c => (
+                <tr key={c.id}>
+                  <td>{c.name}</td>
+                  <td><AlertBadge days_overdue={c.days_overdue} /></td>
+                  <td>{c.phone}</td>
+                  <td><button onClick={() => handleSelectCustomer(c)}>Xem Chi Tiết</button></td>
+                </tr>
+              ))}
+            </tbody>
           </table>
         </div>
       </div>
     );
-  } 
-  // Giao diện chi tiết - Khi một khách hàng được chọn
-  else {
+  } else {
+    // Giao diện chi tiết - Khi một khách hàng được chọn
     return (
       <div className="container">
         <div>
@@ -123,6 +155,16 @@ function App() {
           <button className="logout-button" onClick={handleLogout}>Đăng xuất</button>
         </div>
         <h2>{selectedCustomer.name}</h2>
+        <div className="summary-box details-summary">
+            <h4>Tổng tiền khách này đã vay</h4>
+            <p>{selectedCustomer.total_loan_amount ? selectedCustomer.total_loan_amount.toLocaleString() : 0} VND</p>
+        </div>
+        {selectedCustomer.days_overdue > 0 && (
+          <div className="alert-details">
+            CẢNH BÁO: Khách hàng này đã quá hạn trả lãi <strong>{selectedCustomer.days_overdue} ngày</strong>.
+            Kỳ hạn cuối được tính là ngày {new Date(selectedCustomer.earliest_due_date).toLocaleDateString('vi-VN')}.
+          </div>
+        )}
         <hr />
         <h3>Các khoản vay</h3>
         <div className="table-container">
